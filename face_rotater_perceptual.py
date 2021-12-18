@@ -22,7 +22,7 @@ from matplotlib.pyplot import imshow
 import random
 
 from torchvision.transforms.transforms import ToTensor
-
+from tha.perceptual import perceptual_loss,getloss
 from tha.face_morpher import FaceMorpher
 from tha.two_algo_face_rotator import TwoAlgoFaceRotator
 
@@ -153,17 +153,17 @@ model2.load_state_dict(torch.load('./checkpoints/two_algo_face_rotator/two_algo_
 
 #定義loss
 # criterion = nn.MSELoss()
-criterion = nn.L1Loss()
+# criterion = perceptual_loss()
 # criterion1=nn.MSELoss()
 #Adam為一種梯度下降優化演算法
-optimizer = torch.optim.Adam(model2.parameters(), lr=0.0002, betas = (0.5,0.999))
+optimizer = torch.optim.Adam(model2.parameters(), lr=0.0001, betas = (0.5,0.999))
 
 model.eval()
 model2.train()
 n_epoch = 100000
 
 # 準備 dataloader, model, loss criterion 和 optimizer
-img_dataloader = DataLoader(dataset, batch_size=14, shuffle=True)
+img_dataloader = DataLoader(dataset, batch_size=7, shuffle=True)
 
 epoch_loss = 0
 last_epoch_loss=1
@@ -197,9 +197,9 @@ while True:
             color_changed, resampled, color_change, alpha_mask, grid_change, grid=model2(output1,label2)
 
             #將兩個演算法的loss算出來
-            loss1 = criterion(color_changed, target)
+            loss1 = getloss(color_changed, target)
             # loss1=loss1+criterion1(color_changed,target)
-            loss2=criterion(resampled,target)
+            loss2=getloss(resampled,target)
             # loss2=loss2+criterion1(resampled,target)
 
             #之後取平方的平均開根號後回傳給訓練程式
