@@ -22,7 +22,7 @@ class perceptual_loss:
         tar=self.target
         cov_change=model(Variable(ch).cuda())
         cov_target=model(Variable(tar).cuda())
-        self.loss=MSELoss(cov_change,cov_target)
+        self.loss=MSELoss()(cov_change,cov_target)
         return self.loss
 
 def getloss(change,target):
