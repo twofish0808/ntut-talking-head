@@ -1,6 +1,7 @@
 # ntut-talking-head
-### 1.Please drag the perceptual.py into tha folder, and replace, or rename, your old face_rotater.py with the new face_rotater.py. You should be notice that the new face_rotater.py is different from the original one.
-### 2.You should change your batch size when you are training, because that the VGG16 requires a lot of nvram.
+### 1.Notice
+#### (1)Please drag the perceptual.py into tha folder, and replace, or rename, your old face_rotater.py with the new face_rotater.py. You should be notice that the new face_rotater.py is different from the original one.
+#### (2)You should change your batch size when you are training, because that the VGG16 requires a lot of nvram.
 ### 3.Ways to use perceptual loss:
 #### (1)Use as class
 ```
