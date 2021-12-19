@@ -22,18 +22,20 @@ class perceptual_loss:
         tar=self.target
         cov_change=model(Variable(ch).cuda())
         cov_target=model(Variable(tar).cuda())
-        self.loss=MSELoss()(cov_change,cov_target)
+        self.loss=MSELoss(cov_change,cov_target)
         return self.loss
 
 def getloss(change,target):
-        model=vgg16(pretrained=True)
-        model.features[0]=nn.Conv2d(4, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        model=vgg16_bn(pretrained=True).features
+        model[0]=nn.Conv2d(4, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         model.eval()
         model.cuda()
 
         ch=change
         tar=target
         cov_change=model(Variable(ch).cuda())
+        torch.cuda.empty_cache()
         cov_target=model(Variable(tar).cuda())
+        torch.cuda.empty_cache()
         loss=MSELoss()(cov_change,cov_target)
         return loss
