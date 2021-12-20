@@ -17,4 +17,11 @@
 ### 4.Theory
 #### (1)Use the VGG16 which is already modify the first layer of the model, that it can input a 4-channel picture.
 #### (2)Put the output and label into the new_model, and get two outputs. Put these two outputs into MSELoss, and return it to the training function.
+
+### 5.Schedule
+#### 2021.08.17 由學長畢業論文交接。Start training Face_Morpher.
+#### 2021.10.16 Start traing Rotator(by using L1loss). We use about 20 models by training 2 days to check whether the traing progress is OK.
+#### 2021.10.29 Start traing Combiner(by using L1Loss).We use about 20 models by training 2 days to check whether the traing progress is OK.
+#### 2021.11.15 Start traing Rotator(by using L1loss). Full model train.
+#### 2021.12.20 Switch the Rotator to perceptual loss. With full model train.
    
