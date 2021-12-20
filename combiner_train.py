@@ -21,6 +21,7 @@ from torchvision.transforms.transforms import ToTensor
 from tha.face_morpher import FaceMorpher
 from tha.two_algo_face_rotator import TwoAlgoFaceRotator
 from tha.combiner import Combiner
+from tha.perceptual import perceptual_loss,getloss
 
 print(torch.cuda.is_available())
 print(torch.cuda.get_device_name(torch.cuda.current_device()))
@@ -185,7 +186,7 @@ model3.train()
 n_epoch = 100000
 
 # 準備 dataloader, model, loss criterion 和 optimizer
-img_dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+img_dataloader = DataLoader(dataset, batch_size=7, shuffle=True)
 
 epoch_loss = 0
 last_epoch_loss=1
@@ -215,9 +216,10 @@ while True:
 
             #img經過face_morpher處理輸出為output1，其他兩個變數為演算法衍伸物，詳細return內容可見tha/face_morpher.py
             output1, alpha, color = model(img, label)
-
+            torch.cuda.empty_cache()
             #output1經過face_rotator處理輸出為color_changed和resampled，其他兩個變數為演算法衍伸物，詳細return內容和演算法可見tha/two_algo_face_rotator.py
             color_changed, resampled, color_change, alpha_mask, grid_change, grid=model2(output1,label2)
+            torch.cuda.empty_cache()
 
             
 
@@ -228,7 +230,7 @@ while True:
             # label2=torch.div(label2,1/15)
 
             final_image, combined_image, combine_alpha_mask, retouch_alpha_mask, retouch_color_change=model3(color_changed,resampled,label2)
-            loss=criterion(final_image,target)
+            loss=getloss(final_image,target)+criterion(final_image,target)
             
 
             # #之後取平方的平均開根號後回傳給訓練程式
