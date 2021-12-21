@@ -32,11 +32,11 @@ print(torch.cuda.get_device_name(torch.cuda.current_device()))
 # In[2]:
 
 
-imgFolder = 'D:/talking-head-anime-demo-master/dataSet1/some_img'                     #Img Path
-labelFolder = 'D:/talking-head-anime-demo-master/dataSet1/some_label'                #Label Path
+imgFolder = 'D:/talking-head-anime-demo-master/dataSet1/img'                     #Img Path
+labelFolder = 'D:/talking-head-anime-demo-master/dataSet1/label'                #Label Path
 dataImgTxt = 'D:/talking-head-anime-demo-master/tryDataImg2.txt'             #Output DataImg.txt
 targetImgTxt = 'D:/talking-head-anime-demo-master/tryTargetImg2.txt'         #Output TargetImg.txt
-labelTxt = 'D:/talking-head-anime-demo-master/tryLabel2.txt'              
+labelTxt = 'D:/talking-head-anime-demo-master/tryLabel2.txt'          
 
 
 # In[3]:
@@ -152,11 +152,11 @@ model2= TwoAlgoFaceRotator().cuda()
 model2.load_state_dict(torch.load('./checkpoints/two_algo_face_rotator/two_algo_face_rotator.pt'))
 
 #定義loss
-# criterion = nn.MSELoss()
+criterion = nn.L1Loss()
 # criterion = perceptual_loss()
 # criterion1=nn.MSELoss()
 #Adam為一種梯度下降優化演算法
-optimizer = torch.optim.Adam(model2.parameters(), lr=0.0001, betas = (0.5,0.999))
+optimizer = torch.optim.Adam(model2.parameters(), lr=0.00015, betas = (0.5,0.999))
 
 model.eval()
 model2.train()
@@ -186,25 +186,29 @@ while True:
             #+是tensor的外包装，也就像錢和錢包那種概念，裡面還有其他東西
             img = Variable(img).cuda()
             label = Variable(label).cuda()
-            label2= Variable(label2).cuda()
+            label2=Variable(label2).cuda()
             target = Variable(target).cuda()
 
 
             #img經過face_morpher處理輸出為output1，其他兩個變數為演算法衍伸物，詳細return內容可見tha/face_morpher.py
             output1, alpha, color = model(img, label)
-
+            
+            torch.cuda.empty_cache()
             #output1經過face_rotator處理輸出為color_changed和resampled，其他兩個變數為演算法衍伸物，詳細return內容和演算法可見tha/two_algo_face_rotator.py
             color_changed, resampled, color_change, alpha_mask, grid_change, grid=model2(output1,label2)
+            torch.cuda.empty_cache()
 
             #將兩個演算法的loss算出來
             loss1 = getloss(color_changed, target)
+            loss1=loss1+criterion(color_changed,target)
             # loss1=loss1+criterion1(color_changed,target)
             loss2=getloss(resampled,target)
+            loss2=loss2+criterion(resampled,target)
             # loss2=loss2+criterion1(resampled,target)
 
             #之後取平方的平均開根號後回傳給訓練程式
-            loss=(((loss2**2)+(loss1**2))**0.5)/2
-            # loss=(loss1+loss2)/2
+            # loss=(((loss2**2)+(loss1**2))**0.5)/2
+            loss=(loss1+loss2)/2
             # loss=loss2
             optimizer.zero_grad()
             loss.backward()
@@ -212,23 +216,23 @@ while True:
 
             #輸出所有演算法衍伸物和結果，以方便觀察(可寫可不寫)
             unloader = transforms.ToPILImage()
-            original=img.cuda().clone()
+            original=img.cpu().clone()
             original = unloader(original[0]).save("./train_file/original.png")
-            color1 = color.cuda().clone()
+            color1 = color.cpu().clone()
             color1 = unloader(color1[0]).save("./train_file/color.png")
-            alpha1 = alpha.cuda().clone()
+            alpha1 = alpha.cpu().clone()
             alpha1 = unloader(alpha1[0]).save("./train_file/alpha.png")
-            output_image = output1.cuda().clone()
+            output_image = output1.cpu().clone()
             output_image = unloader(output_image[0]).save("./train_file/output_image.png")
-            target1 = target.cuda().clone()
+            target1 = target.cpu().clone()
             target1 = unloader(target1[0]).save("./train_file/target1.png")
-            color_cd1 = color_changed.cuda().clone()
+            color_cd1 = color_changed.cpu().clone()
             color_cd1 = unloader(color_cd1[0]).save("./train_file/color_changed.png")
-            resampled1 = resampled.cuda().clone()
+            resampled1 = resampled.cpu().clone()
             resampled1 = unloader(resampled1[0]).save("./train_file/resampled.png")
-            color_change1 = color_change.cuda().clone()
+            color_change1 = color_change.cpu().clone()
             color_change1 = unloader(color_change1[0]).save("./train_file/color_change.png")
-            alpha_mask1 = alpha_mask.cuda().clone()
+            alpha_mask1 = alpha_mask.cpu().clone()
             alpha_mask1 = unloader(alpha_mask1[0]).save("./train_file/alpha_mask.png")
 
             #計算epoch的loss之和，並準備下一次訓練
@@ -254,8 +258,6 @@ while True:
         #完成一個epoch後進行存檔        
         torch.save(model2.state_dict(),"./checkpoints/two_algo_face_rotator/two_algo_face_rotator.pt")
         print("save_successfully")
-        if(epoch)%1==0:
-            time.sleep(6000)
 
 
         #每500個epoch自動備份(若不需要可註解掉)
