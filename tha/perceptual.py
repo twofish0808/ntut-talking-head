@@ -13,18 +13,41 @@ class perceptual_loss:
         self.change=change
         self.target=target
     def forword(self):
-        model=vgg16(pretrained=True)
-        model.features[0]=nn.Conv2d(4, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-        model.eval()
-        model.cuda()
-        print(model)
-        print(self.change[0])
+        model=vgg16(pretrained=True).features
+        model[0]=nn.Conv2d(4, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        for i in range(16,31):
+            del model[16]
+
         ch=self.change
         tar=self.target
-        cov_change=model(Variable(ch).cuda())
-        cov_target=model(Variable(tar).cuda())
-        self.loss=MSELoss(cov_change,cov_target)
-        return self.loss
+        loss=0
+        new_model=get_newm(model,15,15)
+        new_model.eval()
+        new_model.cuda()
+        result=new_model(ch)
+        vgg_target=new_model(tar)
+        loss=L1Loss()(result,vgg_target)
+        torch.cuda.empty_cache()
+
+
+        new_model=get_newm(model,8,15)
+        new_model.eval()
+        new_model.cuda()
+        result=new_model(ch)
+        vgg_target=new_model(tar)
+        loss=L1Loss()(result,vgg_target)+loss
+        torch.cuda.empty_cache()
+
+        new_model=get_newm(model,3,8)
+        new_model.eval()
+        new_model.cuda()
+        result=new_model(ch)
+        vgg_target=new_model(tar)
+        loss=L1Loss()(result,vgg_target)+loss
+        torch.cuda.empty_cache()
+
+        return loss
+
 
 def getloss(change,target):
     model=vgg16(pretrained=True).features
