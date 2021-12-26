@@ -26,4 +26,5 @@
 #### 2021.10.29 Start traing Combiner(by using L1Loss).We use about 20 models by training 2 days to check whether the traing progress is OK.
 #### 2021.11.15 Start traing Rotator(by using L1loss). Full model train.
 #### 2021.12.20 Switch the Rotator to perceptual loss. With full model train.
+#### 2021.12.26 Try to add noise on the training data.
    
