@@ -31,10 +31,11 @@
 ```
 
 ### 4.enviroment
-#### matplotlib==NEWEST
-#### pytorch==1.8 or above
-#### python==3.6 or above
-#### cuda==10.2 or above (better use cuda11.1)
+#### matplotlib(all the version is fine)
+#### pytorch==1.8 or above(includes all the dependency packages)
+#### python==3.6 or above(better use python 3.9.7)
+#### cuda==10.2 or above (better use cuda11.1 or above)
+#### We suggest you use the RTX2060 or above, or it will not be smooth in the demo.
 
 ## 2.Perceptual_loss
 ### 1.Notice
