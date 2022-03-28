@@ -40,6 +40,7 @@ class ManualPoserApp:
         control_frame = Frame(self.master, borderwidth=2, relief=GROOVE)
         control_frame.pack(side=LEFT, fill='y')
 
+
         self.param_sliders = []
         for param in self.poser.pose_parameters():
             slider = Scale(control_frame,

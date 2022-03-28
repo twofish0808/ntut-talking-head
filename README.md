@@ -18,6 +18,8 @@
 ```
 	+--Talking-head-anime
 	 |-app
+	 |+-demo.py
+	 ||-poser_test.py
 	 |-test_app
 	 |-test
 	 +-checkpoint
@@ -29,6 +31,10 @@
 ```
    $python app/poser_test.py
 ```
+#### Also the puppeteer.
+````
+   $python app/demo.py
+````
 
 ### 4.enviroment
 #### matplotlib(all the version is fine)

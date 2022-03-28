@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 
 sys.path.append(os.getcwd())
@@ -32,6 +32,7 @@ from tha.face_morpher import FaceMorpher
 from tha.two_algo_face_rotator import TwoAlgoFaceRotator
 from tha.combiner import Combiner
 import pandas as pd
+from tha.rotator_lite import FaceRotator_lite
 
 
 class ManualPoserApp:
@@ -131,12 +132,9 @@ class ManualPoserApp:
         self.modeln1=FaceMorpher().cuda()
         self.modeln1.load_state_dict(torch.load('checkpoint/face_morpher.pt'))
         self.modeln1.eval()
-        self.modeln2=TwoAlgoFaceRotator().cuda()
-        self.modeln2.load_state_dict(torch.load('checkpoint/two_algo_face_rotator.pt'))
+        self.modeln2=FaceRotator_lite().cuda()
+        self.modeln2.load_state_dict(torch.load('checkpoint/rotator_lite.pt'))
         self.modeln2.eval()
-        self.modeln3=Combiner().cuda()
-        self.modeln3.load_state_dict(torch.load('checkpoint/combiner.pt'))
-        self.modeln3.eval()
 
 
     def load_image(self):
@@ -202,11 +200,10 @@ class ManualPoserApp:
         img=Variable(img).cuda()
 
         output1, alpha, color = self.modeln1(img, label)
-        color_changed, resampled, color_change, alpha_mask, grid_change, grid=self.modeln2(output1,label2)
-        final_image, combined_image, combine_alpha_mask, retouch_alpha_mask, retouch_color_change=self.modeln3(color_changed,resampled,label2)
+        resampled, grid_change, grid=self.modeln2(output1,label2)
         unloader = transforms.ToPILImage()
 
-        final_image1 = final_image.cpu().clone()
+        final_image1 = resampled.cpu().clone()
         final_image1 = unloader(final_image1[0]).save("test/final_image.png") 
 
         #test(self.source_image, self.current_morph_pose, self.current_rotate_pose)
