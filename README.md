@@ -21,7 +21,7 @@
 	 |-test
 	 |
 	 +--app
-	 | +-demo.py
+	 | |-demo.py
 	 | ∟poser_test.py
 	 |
 	 +--checkpoint
