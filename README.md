@@ -17,21 +17,28 @@
 #### Replace the app folder, and put test_app folder in the root directory,and create test and checkpoint those two floders. Put your .pt file in the checkpoint folder. It should be like this.
 ```
 	+--Talking-head-anime
-	 |-app
-	 |+-demo.py
-	 ||-poser_test.py
 	 |-test_app
 	 |-test
-	 +-checkpoint
-	  |-combiner.pt
-	  |-face_morpher.pt
-	  |-two_algo_face_rotator.pt
+	 |
+	 +--app
+	 | +-demo.py
+	 | ∟poser_test.py
+	 |
+	 +--checkpoint
+	   |-combiner.pt
+	   |-face_morpher.pt
+	   ∟two_algo_face_rotator.pt
 ```
 #### And you can run like this.
 ```
    $python app/poser_test.py
 ```
 #### Also the puppeteer.
+##### To install enviroment
+````
+   $conda env create -f demo.yml
+````
+##### Run puppeteer.
 ````
    $python app/demo.py
 ````
