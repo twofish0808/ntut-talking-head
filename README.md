@@ -12,6 +12,8 @@
 #### 2021.12.20 Switch the Rotator to perceptual loss. With full model train.
 #### 2021.12.26 Try to add noise on the training data.
 #### 2022.03.19 Add our own app, with adjustable brightness to improve user's experience.
+#### 2022.04.02 start adding discriminator in rotator and the combiner.
+#### 2022.05.07 End training.
 
 ### 3.Run Demo
 #### Replace the app folder, and put test_app folder in the root directory,and create test and checkpoint those two floders. Put your .pt file in the checkpoint folder. It should be like this.
