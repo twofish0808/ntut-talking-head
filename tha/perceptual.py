@@ -11,6 +11,7 @@ from torch import Tensor
 import numpy as np
 
 
+
 class Vgg16(nn.Module):
     def __init__(self):
         super(Vgg16, self).__init__()
@@ -152,7 +153,94 @@ def get_newm(model,num,last):
         #     print("out of ramge")
     return model
 
+class vgg_discriminator(nn.Module):
+    def __init__(self):
+        super(vgg_discriminator, self).__init__()
+        self.conv1_1=conv_block(7,64,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.conv1_2=conv_block(64,64,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.maxPool1=nn.MaxPool2d(kernel_size=2,stride=2,padding=0,dilation=1,ceil_mode=False)
+        self.conv2_1=conv_block(64,128,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.conv2_2=conv_block(128,128,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.maxPool2=nn.MaxPool2d(kernel_size=2,stride=2,padding=0,dilation=1,ceil_mode=False)
+        self.conv3_1=conv_block(128,256,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.conv3_2=conv_block(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+        self.conv3_3=conv_block(256,256,kernel_size=(3,3),stride=(1,1),padding=(1,1))
+
+    def forward(self,x):
+        x=self.conv1_1(x)
+        a1=self.conv1_2(x)
+        a2=self.maxPool1(a1)
+        a2=self.conv2_1(a2)
+        a2=self.conv2_2(a2)
+        a3=self.maxPool2(a2)
+        a3=self.conv3_1(a3)
+        a3=self.conv3_2(a3)
+        a3=self.conv3_3(a3)
+
+        a1=nn.Tanh()(a1)
+        a2=nn.Tanh()(a2)
+        a3=nn.Tanh()(a3)
+
+        return a1,a2,a3
+
+
+class conv_block(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, bias=True):
+        super(conv_block, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias),
+            nn.LeakyReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
+def return_vgg():
+    model=vgg_discriminator()
+    print(model)
+
+
+class Discriminator(nn.Module):
+    def __init__(self, in_channels=1):
+        super(Discriminator, self).__init__()
+
+        def discriminator_block(in_filters, out_filters,dp=0.2, normalization=True):
+            """Returns downsampling layers of each discriminator block"""
+            layers = [nn.Conv2d(in_filters, out_filters, 4, stride=2, padding=1)]
+            if normalization:
+                layers.append(nn.InstanceNorm2d(out_filters))
+            layers.append(nn.LeakyReLU(0.1, inplace=True))
+            layers.append(nn.Dropout(dp))
+            return layers
+
+        self.model = nn.Sequential(
+            *discriminator_block(7, 64,normalization=False),
+            *discriminator_block(64, 128),
+            *discriminator_block(128, 256),
+            *discriminator_block(256, 512),
+            nn.ZeroPad2d((1, 0, 1, 0)),
+            nn.Conv2d(512, 1, 4, padding=1, bias=False),
+            nn.Tanh()
+            )
+
+    def forward(self, img_A, img_B):
+        # Concatenate image and condition image by channels to produce input
+        img_input = torch.cat((img_A, img_B), 1)
+        return self.model(img_input).view(-1)
 
 
 
 
+
+class Vgg_discriminator(nn.Module):
+    def __init__(self) :
+        super(Vgg_discriminator, self).__init__()
+        self.loss=0
+        self.model=vgg16(pretrained=True).features
+        self.model[0]=nn.Conv2d(7, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    def forward(self,image_A,image_B):
+        image=torch.cat((image_A,image_B),1)
+        
+        
+
+        return self.model(image).view(-1)
