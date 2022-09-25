@@ -75,4 +75,5 @@
 #### (2)Put the output and label into the new_model, and get layer3, layer8, layer15 outputs,Those are three relu layers. Put each two outputs into L1Loss, and return it to the training function.
 
 
-   
+ ### 3.The GAN
+ #### It's still a prelease the document and some variable will be adjust at the future.  
